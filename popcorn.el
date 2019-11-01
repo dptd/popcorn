@@ -32,14 +32,14 @@
   :prefix "popcorn-")
 
 (defcustom popcorn-api-key ""
-  "Key used to access TMDB API."
+  "Key used to access TMDB's API."
   :type 'string)
 
 ;; Interactive Function
 (defun popcorn (title)
   "Displays information about TITLE in a new buffer."
   (interactive "sMovie title: ")
-  (if (string-empty-p title)
+  (if (string= "" title)
       (message "Title cannot be empty.")
     (popcorn-display title)))
 
@@ -52,6 +52,40 @@
   "Structure for representing single movie."
   poster title rating votes released runtime url budget revenue imdb tagline overview)
 
+;; Prints
+(defun popcorn-movie-temporary-window-print (movie)
+  "Display results for MOVIE."
+  (message (cl-concatenate 'string
+                        "   Title: " (popcorn-movie-title movie) "\n"
+                        "  Rating: " (number-to-string (popcorn-movie-rating movie)) " (" (number-to-string (popcorn-movie-votes movie)) " votes)\n"
+                        "Released: " (popcorn-movie-released movie) "\n"
+                        " Runtime: " (number-to-string (popcorn-movie-runtime movie)) " minutes\n"
+                        " Website: " (popcorn-movie-url movie) "\n"
+                        "  Budget: $" (number-to-string (popcorn-movie-budget movie)) "\n"
+                        " Revenue: $" (number-to-string (popcorn-movie-revenue movie)) "\n"
+                        "    IMDB: http://www.imdb.com/title/" (popcorn-movie-imdb movie) "\n"
+                        " Tagline: " (popcorn-movie-tagline movie) "\n"
+                        "Overview: " (popcorn-movie-overview movie) "\n")))
+
+(defun popcorn-movie-window-print (movie)
+  "Display results for MOVIE."
+  (switch-to-buffer-other-window "popcorn")
+  (insert (cl-concatenate 'string
+                       "   Title: " (popcorn-movie-title movie) "\n"
+                       "  Rating: " (number-to-string (popcorn-movie-rating movie)) " (" (number-to-string (popcorn-movie-votes movie)) " votes)\n"
+                       "Released: " (popcorn-movie-released movie) "\n"
+                       " Runtime: " (number-to-string (popcorn-movie-runtime movie)) " minutes\n"
+                       " Website: " (popcorn-movie-url movie) "\n"
+                       "  Budget: $" (number-to-string (popcorn-movie-budget movie)) "\n"
+                       " Revenue: $" (number-to-string (popcorn-movie-revenue movie)) "\n"
+                       "    IMDB: http://www.imdb.com/title/" (popcorn-movie-imdb movie) "\n"
+                       " Tagline: " (popcorn-movie-tagline movie) "\n"
+                       "Overview: " (popcorn-movie-overview movie) "\n"))
+  (read-only-mode)
+  (goto-char (point-min))
+(toggle-truncate-lines -1))
+
+;; Testing
 (defvar popcorn-test-movie
   (popcorn-movie-create :poster nil
                         :title "TestTitle"
@@ -66,21 +100,5 @@
                         :tagline nil
                         :overview "Test overview."))
 
-;; Prints
-(defun popcorn-movie-window-print (movie)
-  "Display results for MOVIE."
-  (message (concatenate 'string
-                        "   Title: " (popcorn-movie-title movie) "\n"
-                        "  Rating: " (number-to-string (popcorn-movie-rating movie)) " (" (number-to-string (popcorn-movie-votes movie)) " votes)\n"
-                        "Released: " (popcorn-movie-released movie) "\n"
-                        " Runtime: " (number-to-string (popcorn-movie-runtime movie)) " minutes\n"
-                        " Website: " (popcorn-movie-url movie) "\n"
-                        "  Budget: $" (number-to-string (popcorn-movie-budget movie)) "\n"
-                        " Revenue: $" (number-to-string (popcorn-movie-revenue movie)) "\n"
-                        "    IMDB: " (popcorn-movie-imdb movie) "\n"
-                        " Tagline: " (popcorn-movie-tagline movie) "\n"
-                        "Overview: " (popcorn-movie-overview movie) "\n")))
-
 (provide 'popcorn)
 ;;; popcorn.el ends here
-
